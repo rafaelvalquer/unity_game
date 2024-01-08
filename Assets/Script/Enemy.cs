@@ -114,10 +114,6 @@ public class Enemy : MonoBehaviour
         Debug.Log("Enemy Name in Start: @@@@@@@@ " + enemyAttributes.enemyName);
 
         // Carregue os itens equipados ao iniciar
-
-
-
-
      
     }
 
