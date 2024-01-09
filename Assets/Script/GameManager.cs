@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
     public string playerName;
     public CharacterAttributes characterAttributes;
     public CharacterEquipment characterEquipment;
+    public EnemyAttributes enemyAttributes;
+
 
     private void Awake()
     {

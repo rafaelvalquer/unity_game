@@ -104,16 +104,11 @@ public class Enemy : MonoBehaviour
         LoadEquippedItems(GameManager.Instance.characterAttributes.nextEnemyName);
 
         
-        Debug.Log("Status itemType = " + enemyAttributes.equipment.weaponSlot.itemType);
-        Debug.Log("Status itemName = " + enemyAttributes.equipment.weaponSlot.itemName);
-        Debug.Log("Status itemAtk = " + enemyAttributes.equipment.weaponSlot.itemAtk);
-        Debug.Log("Status itemDef = " + enemyAttributes.equipment.weaponSlot.itemDef);
-
-
-
+        //Debug.Log("Status itemType = " + enemyAttributes.equipment.weaponSlot.itemType);
+        //Debug.Log("Status itemName = " + enemyAttributes.equipment.weaponSlot.itemName);
+        //Debug.Log("Status itemAtk = " + enemyAttributes.equipment.weaponSlot.itemAtk);
+        //Debug.Log("Status itemDef = " + enemyAttributes.equipment.weaponSlot.itemDef);
         Debug.Log("Enemy Name in Start: @@@@@@@@ " + enemyAttributes.enemyName);
-
-        // Carregue os itens equipados ao iniciar
      
     }
 
@@ -138,7 +133,7 @@ public class Enemy : MonoBehaviour
         }
 
         // Animacao de ataque concluída, agora habilitamos o painel eretira o HP
-        menuBattleManager.TakeDamage(10);
+        menuBattleManager.EnemyAttack();
         menuBattleManager.HabilitarPanelAcao();
     }
         public void ReturnToIdle()

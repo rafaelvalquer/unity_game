@@ -84,6 +84,7 @@ public class Player : MonoBehaviour
             yield return null;
         }
         // Animção de ataque terminou, agora podemos chamar a próxima função
+        menuBattleManager.PlayerAttack();
         enemyScript.ExecuteAttackAnimation();
     }
 
