@@ -8,7 +8,11 @@ public class Player : MonoBehaviour
 
     private Rigidbody2D rb;
     private Animator anim;
+
+    // ------VARIAVEIS DE MOVIMENTAÇÃO------------------------------
     private bool isMoving = false;
+    private bool allowMoveForward = true;
+
 
 
     // Referência ao script do inimigo
@@ -31,17 +35,25 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        // Move o personagem apenas se a tecla Enter for pressionada
-        if (Input.GetKeyDown(KeyCode.Return) && !isMoving)
+        // Inicia o movimento do personagem ao pressionar a tecla de seta direcional direita
+        if (Input.GetKeyDown(KeyCode.RightArrow) && allowMoveForward)
         {
+            allowMoveForward = true;  // Impede movimento para frente
             isMoving = true;
+        }
+
+        // Para o movimento do personagem ao soltar a tecla de seta direcional direita
+        if (Input.GetKeyUp(KeyCode.RightArrow))
+        {
+            isMoving = false;
+            rb.velocity = new Vector2(0f, rb.velocity.y);  // Define a velocidade horizontal como zero
+            anim.SetBool("Run", false);
         }
 
         if (isMoving)
         {
             // Move o personagem no eixo X
             Move();
-
         }
     }
 
@@ -52,6 +64,27 @@ public class Player : MonoBehaviour
         anim.SetBool("Run", true);
     }
 
+    // Função para chamar quando você não quer mais que o jogador vá para frente
+    public void BloquearMovimentoParaFrente()
+    {
+        allowMoveForward = false;
+        isMoving = false;
+        rb.velocity = new Vector2(0f, rb.velocity.y);  // Define a velocidade horizontal como zero
+        anim.SetBool("Run", false);
+    }
+    // Função para chamar quando você quer permitar que o jogador vá para frente
+    public void DesbloquearMovimentoParaFrente()
+    {
+    allowMoveForward = true;
+    isMoving = false;
+    rb.velocity = new Vector2(moveSpeed, rb.velocity.y);  // Define a velocidade horizontal
+    anim.SetBool("Run", false);
+    }
+
+
+
+
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Enemy"))
@@ -60,6 +93,7 @@ public class Player : MonoBehaviour
             rb.velocity = Vector2.zero;
             isMoving = false;
             anim.SetBool("Run", false);
+            DesbloquearMovimentoParaFrente();
             menuBattleManager.HabilitarPanelAcao();
         }
     }

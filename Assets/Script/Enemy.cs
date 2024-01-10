@@ -45,13 +45,15 @@ public class EnemyAttributes
     public int accuracy;
     public int evasion;
     public int critical;
+    // Nova propriedade para armazenar as linhas de diálogo
+    public string[] Dialogues { get; private set; }
 
     public EnemyEquipment equipment;
 
     public EnemyAttributes(string name, int maxHealth, int maxMana, int atk, int def, int spd, int acc, int eva, int crit,
                            string weaponType, string weaponName, int weaponAtk, int weaponDef, string weaponSpritePath,
                            string shieldType, string shieldName, int shieldAtk, int shieldDef, string shieldSpritePath,
-                           string helmetType, string helmetName, int helmetAtk, int helmetDef, string helmetSpritePath)
+                           string helmetType, string helmetName, int helmetAtk, int helmetDef, string helmetSpritePath,  string[] dialogues)
     {
         enemyName = name;
         maxHP = maxHealth;
@@ -67,6 +69,8 @@ public class EnemyAttributes
         evasion = eva;
         critical = crit;
 
+        Dialogues = dialogues;
+
         equipment = new EnemyEquipment();
         equipment.weaponSlot = new EnemyEquipmentSlot(weaponType, weaponName, weaponAtk, weaponDef, weaponSpritePath);
         equipment.shieldSlot = new EnemyEquipmentSlot(shieldType, shieldName, shieldAtk, shieldDef, shieldSpritePath);
@@ -77,11 +81,16 @@ public class EnemyAttributes
 
 public class Enemy : MonoBehaviour
 {
+    // Animator do inimigo
     public Animator enemyAnim;
+
+
     // Referência ao script do Player
     private Player playerScript;
     // Referência ao script do Menu
     private MenuBattleManager menuBattleManager;
+
+
     public EnemyAttributes enemyAttributes;
 
     // Adicione as referências aos seus SpriteRenderers no Inspector
@@ -89,18 +98,31 @@ public class Enemy : MonoBehaviour
     public SpriteRenderer shieldSpriteRenderer;
     public SpriteRenderer helmetSpriteRenderer;
 
+
+    // ------REFERENCIAS PARA OS DIALOGOS------------------------------
+    private string speechTxt; // PRIMEIRA FRASE DO DIALOGO
+    private string resosta1Txt; // RESPOSTA 1
+    private string resosta2Txt; // RESPOSTA 2
+    private string speechFinalTxt; // Texto Final
+    private string actorNameEnemy;
+    public LayerMask playerLayer; // Layer do player
+    public float radious; // 
+
+    // ------VARIAVEL PARA DESABILITAR A FUNÇÃO Interact------------------------------
+    private bool interactionEnabled = true;
+
+
+
+
     private void Start()
-    {
+    {        
         // Obtenha a referência ao MenuBattleManager
         menuBattleManager = FindObjectOfType<MenuBattleManager>();
         // Obtenha a referência ao Player
         playerScript = FindObjectOfType<Player>();
 
-        // Certifique-se de que o Animator foi atribuído no Inspector
-        if (enemyAnim == null)
-        {
-            Debug.LogError("Animator not assigned to the enemy script. Please assign it in the Inspector.");
-        }
+
+        // Carrega os Itebs
         LoadEquippedItems(GameManager.Instance.characterAttributes.nextEnemyName);
 
         
@@ -108,11 +130,48 @@ public class Enemy : MonoBehaviour
         //Debug.Log("Status itemName = " + enemyAttributes.equipment.weaponSlot.itemName);
         //Debug.Log("Status itemAtk = " + enemyAttributes.equipment.weaponSlot.itemAtk);
         //Debug.Log("Status itemDef = " + enemyAttributes.equipment.weaponSlot.itemDef);
-        Debug.Log("Enemy Name in Start: @@@@@@@@ " + enemyAttributes.enemyName);
+        //Debug.Log("Enemy Name in Start: @@@@@@@@ " + enemyAttributes.enemyName);
+        actorNameEnemy = enemyAttributes.enemyName;
+
+        // Atribuindo os dialogos
+        speechTxt =  enemyAttributes.Dialogues[0];
+        resosta1Txt = enemyAttributes.Dialogues[1];
+        resosta2Txt = enemyAttributes.Dialogues[2];
+        speechFinalTxt = enemyAttributes.Dialogues[3];
+
      
     }
+    
+    // ------FUNÇÃO UPDATE QUE TRABALHAR COM FISICA------------------------------
+    private void FixedUpdate()
+    {
+        if (interactionEnabled)
+        {
+        Interact();
+        }
+    }
+    
+    
+    
+    
+    // ------FUNÇÃO PARA INICIAR INTERAÇÃO COM O INIMIGO AO CHEGAR NO COLISOR------------------------------
+    public void Interact()
+    {
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, radious, playerLayer);
 
-        public void ExecuteAttackAnimation()
+        if(hit != null)
+        {
+            menuBattleManager.HabilitarPanelDialogo(speechTxt, actorNameEnemy);
+            interactionEnabled = false;
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.DrawWireSphere(transform.position,radious);
+    }    
+
+    public void ExecuteAttackAnimation()
     {
         // Ative o gatilho para a animação de ataque
         enemyAnim.SetBool("Attack", true);
@@ -121,7 +180,7 @@ public class Enemy : MonoBehaviour
         StartCoroutine(WaitForAttackAnimation());
     }
 
-        private System.Collections.IEnumerator WaitForAttackAnimation()
+    private System.Collections.IEnumerator WaitForAttackAnimation()
     {
         // Aguarda o próximo frame
         yield return null;
@@ -136,7 +195,7 @@ public class Enemy : MonoBehaviour
         menuBattleManager.EnemyAttack();
         menuBattleManager.HabilitarPanelAcao();
     }
-        public void ReturnToIdle()
+    public void ReturnToIdle()
     {
         enemyAnim.SetBool("Attack", false);
     }

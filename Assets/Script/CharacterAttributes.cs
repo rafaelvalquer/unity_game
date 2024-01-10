@@ -139,7 +139,7 @@ public InventorySlot GetInventoryItemBySlot(int slotNumber)
     public CharacterAttributes()
     {
         // Inicialize os atributos com valores padrão ou desejados
-        characterName = "";
+        characterName = "Rafael";
 
         pontosIniciais = 10;
         maxHP = 100;
@@ -148,7 +148,7 @@ public InventorySlot GetInventoryItemBySlot(int slotNumber)
         maxMana = 50;
         currentMana = maxMana;
 
-        attack = 5;
+        attack = 8;
         defense = 5;
         speed = 5;
         accuracy = 5;
