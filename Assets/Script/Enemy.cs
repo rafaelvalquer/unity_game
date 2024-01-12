@@ -195,9 +195,44 @@ public class Enemy : MonoBehaviour
         menuBattleManager.EnemyAttack();
         menuBattleManager.HabilitarPanelAcao();
     }
+
+    public void ExecuteJumpAnimation()
+    {
+        // Ative o gatilho para a animação de pulo
+        enemyAnim.SetBool("Jump", true);
+
+        // Inicie uma coroutine para aguardar o término da animação antes de reativar o painel
+        StartCoroutine(WaitForJumpAnimation());
+    }
+
+    private System.Collections.IEnumerator WaitForJumpAnimation()
+    {
+        // Aguarde até o próximo quadro para garantir que a animação seja acionada
+        yield return null;
+
+        // Aguarde o término da animação de pulo
+    while (enemyAnim.GetCurrentAnimatorStateInfo(0).IsName("Jump"))
+    {
+        // Ajuste a velocidade e altura do pulo conforme necessário
+        float moveSpeed = 100f; // Velocidade de movimento lateral
+        float jumpHeight = 100f; // Altura do pulo
+
+        // Mova o inimigo para a direita enquanto está no ar
+        transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
+
+        // Aplique uma força para cima para simular um pulo
+        transform.Translate(Vector3.up * jumpHeight * Time.deltaTime);
+
+        yield return null;
+    }
+
+        // Desative o gatilho da animação de pulo
+        enemyAnim.SetBool("Jump", false);
+    }
     public void ReturnToIdle()
     {
         enemyAnim.SetBool("Attack", false);
+        enemyAnim.SetBool("Jump", false);
     }
     // Método para carregar os sprites dos itens equipados
     public void LoadEquippedItems(string enemyName)

@@ -3,12 +3,16 @@ using System.Collections;
 
 public class Player : MonoBehaviour
 {
-    public float moveSpeed = 5f;
+    public float moveSpeed = 10f;
+    private bool movendo = false;
     public LayerMask obstacleLayer;
 
     private Rigidbody2D rb;
     private Animator anim;
 
+    // ------PONTOS DE MOVIMENTAÇÃO------------------------------
+    public Transform[] pontosMovimento;
+    private int indicePontoAtual = 0;
     // ------VARIAVEIS DE MOVIMENTAÇÃO------------------------------
     private bool isMoving = false;
     private bool allowMoveForward = true;
@@ -55,6 +59,10 @@ public class Player : MonoBehaviour
             // Move o personagem no eixo X
             Move();
         }
+        if (movendo)
+        {
+            MoverParaProximoAlvo();
+        }
     }
 
     private void Move()
@@ -72,17 +80,6 @@ public class Player : MonoBehaviour
         rb.velocity = new Vector2(0f, rb.velocity.y);  // Define a velocidade horizontal como zero
         anim.SetBool("Run", false);
     }
-    // Função para chamar quando você quer permitar que o jogador vá para frente
-    public void DesbloquearMovimentoParaFrente()
-    {
-    allowMoveForward = true;
-    isMoving = false;
-    rb.velocity = new Vector2(moveSpeed, rb.velocity.y);  // Define a velocidade horizontal
-    anim.SetBool("Run", false);
-    }
-
-
-
 
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -93,17 +90,60 @@ public class Player : MonoBehaviour
             rb.velocity = Vector2.zero;
             isMoving = false;
             anim.SetBool("Run", false);
-            DesbloquearMovimentoParaFrente();
+            BloquearMovimentoParaFrente();
             menuBattleManager.HabilitarPanelAcao();
         }
     }
-        public void ExecuteAttackAnimation()
+    /*    public void ExecuteAttackAnimation()
     {
         // Ative o gatilho para a animação de ataque
         anim.SetBool("Attack", true);
 
         // Inicie a corrotina para esperar o término da animação
         StartCoroutine(WaitForAttackAnimation());
+    }*/
+    public void ExecutarAcaoAtaque()
+    {
+        // Ative o gatilho para a animação de ataque
+        anim.SetBool("Attack", true);
+
+        // Inicie a corrotina para esperar o término da animação
+        StartCoroutine(WaitForAttackAnimation());
+    }
+    public void ExecuteAndarAnimation()
+    {
+        // Ative o gatilho para a animação de ataque
+        anim.SetBool("Run", true);
+        movendo = true;
+        }
+    public void MoverParaProximoAlvo()
+    {
+        if (indicePontoAtual < pontosMovimento.Length)
+        {
+            // Calcula a direção para o próximo alvo (somente no eixo X)
+            Vector3 direcao = new Vector3(transform.position.x - pontosMovimento[indicePontoAtual].position.x, 0f, 0f);
+
+            // Move o personagem na direção calculada com uma velocidade suavizada (somente no eixo X)
+            transform.Translate(direcao.normalized * moveSpeed * Time.deltaTime);
+
+            // Verifica se o personagem atingiu ou ultrapassou o próximo alvo (somente no eixo X)
+            if (Mathf.Abs(transform.position.x - pontosMovimento[indicePontoAtual].position.x) <= 0.5f)
+            {
+                // Define a posição do personagem exatamente no próximo alvo
+                transform.position = new Vector3(pontosMovimento[indicePontoAtual].position.x, transform.position.y, transform.position.z);
+
+                // Incrementa o índice para apontar para o próximo alvo
+                indicePontoAtual++;
+
+                // Se atingiu o último ponto, pare o movimento automático
+                if (indicePontoAtual >= pontosMovimento.Length)
+                {
+                    movendo = false;
+                    anim.SetBool("Run", false);
+                    enemyScript.ExecuteAttackAnimation();
+                }
+            }
+        }
     }
 
     // Corrotina para aguardar o término da animação de ataque
@@ -121,6 +161,7 @@ public class Player : MonoBehaviour
         menuBattleManager.PlayerAttack();
         enemyScript.ExecuteAttackAnimation();
     }
+    
 
         public void ReturnToIdle()
     {

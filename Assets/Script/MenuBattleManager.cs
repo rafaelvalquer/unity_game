@@ -10,6 +10,7 @@ public class MenuBattleManager : MonoBehaviour
     public GameObject panelAcao;
     public Button botaoAtaque;
     public Button botaoDefesa;
+    public Button botaoAndar;
 
     // ------PANEL DE DIALOGO------------------------------
     [Header("Panel Dialogo")]
@@ -88,6 +89,7 @@ public class MenuBattleManager : MonoBehaviour
         // Configura os métodos chamados pelos botões
         botaoAtaque.onClick.AddListener(ExecutarAcaoAtaque);
         botaoDefesa.onClick.AddListener(ExecutarAcaoDefesa);
+        botaoAndar.onClick.AddListener(ExecutarAcaoAndar);
         botaoNextDialogo.onClick.AddListener(() => HabilitarPanelRespostas(enemyAtributo.Dialogues[1], enemyAtributo.Dialogues[2]));
         botaoResposta1.onClick.AddListener(() => HabilitarPanelDialogo(enemyAtributo.Dialogues[3], enemyAtributo.enemyName));
         botaoResposta2.onClick.AddListener(() => HabilitarPanelDialogo(enemyAtributo.Dialogues[3], enemyAtributo.enemyName));
@@ -132,7 +134,8 @@ public class MenuBattleManager : MonoBehaviour
         DesabilitarPanelDialogo();
         panelStatusGame.SetActive(true);
         statusText.text = txt;
-        playerScript.DesbloquearMovimentoParaFrente();
+        HabilitarPanelAcao();
+        //playerScript.DesbloquearMovimentoParaFrente();
 
     }
     public void HabilitarPanelRespostas(string resposta1, string resposta2)
@@ -189,12 +192,13 @@ public class MenuBattleManager : MonoBehaviour
     private void ExecutarAcaoAtaque()
     {
         // Lógica do ataque
-        playerScript.ExecuteAttackAnimation();
+        playerScript.ExecutarAcaoAtaque();
 
 
         // Desabilita o painel após a ação
         DesabilitarPanelAcao();
     }
+    
 
     // Função chamada pelo botão de defesa
     private void ExecutarAcaoDefesa()
@@ -202,6 +206,12 @@ public class MenuBattleManager : MonoBehaviour
         // Lógica da defesa
         // Desabilita o painel após a ação
         DesabilitarPanelAcao();
+    }
+
+    private void ExecutarAcaoAndar()
+    {
+        // Lógica do andar
+        playerScript.ExecuteAndarAnimation();
     }
 
     public void TakeDamage(int damage)
